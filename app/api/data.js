@@ -276,11 +276,44 @@ const data = {
       },
       "completeDigitalCare": {
         "title": "Complete Digital Care",
-        "subtitle": "Website Maintenance & Support",
+        "subtitle": "Website Maintenance & Support ensuring security, updates, technical stability, speed and continuous operation.",
         "price": 249,
         "currency": "EUR",
         "billingCycle": "monthly",
         "adBanner": "First job free – to evaluate the quality of services, see the result and process.",
+        "packages": [
+          {
+            "name": "Standard Care",
+            "price": 249,
+            "currency": "EUR",
+            "duration": "Monthly",
+            "description": "Essential maintenance for growing businesses that require stability and security.",
+            "features": [
+              "Monthly system security audit",
+              "Hosting on optimized servers",
+              "Monthly reports & updates",
+              "Incident resolution (3h)",
+              "4h free support included",
+              "Staging environment access"
+            ]
+          },
+          {
+            "name": "Priority Care",
+            "price": 549,
+            "currency": "EUR",
+            "duration": "Monthly",
+            "description": "High-priority support for enterprise platforms requiring zero downtime and rapid response.",
+            "features": [
+              "Weekly system security audit",
+              "Priority hosting environment",
+              "Weekly performance reports",
+              "Instant incident resolution",
+              "12h free support included",
+              "Dedicated account manager",
+              "Custom feature updates"
+            ]
+          }
+        ],
         "features": [
           "System security audit",
           "Hosting on optimised and monitored server environment",
@@ -301,26 +334,69 @@ const data = {
         "process": [
           {
             "step": "01",
-            "title": "Security and Server Configuration",
-            "description": "We have high security standards for web projects and protect the systems against hacking. We transfer developed systems to a secure server and prepare system backups."
+            "title": "Security & Config",
+            "duration": "1 Cycle",
+            "description": "We establish high security standards and protect systems against potential threats from day one."
           },
           {
             "step": "02",
-            "title": "Updates and Warranty",
-            "description": "We give you access to the Service Desk so that you can see the work progress. Easy change tracking via GitHub repository. We ensure the highest quality of the solution."
+            "title": "Updates & Warranty",
+            "duration": "Continuous",
+            "description": "Regular system updates and highest quality assurance via our internal Service Desk system."
           },
           {
             "step": "03",
             "title": "Support 24/7",
-            "description": "We are always in touch and happy to cooperate with our customers. We advise on various web and digital marketing solutions and deliver complete training and support. System monitoring 24/7."
+            "duration": "Perpetual",
+            "description": "Constant system monitoring and perpetual advisory on digital growth and technical stability."
+          },
+          {
+            "step": "04",
+            "title": "Optimization",
+            "duration": "Performance",
+            "description": "Continuous speed and performance audits to ensure your platform runs at peak efficiency."
           }
+        ],
+        "technologies": [
+          "AWS", "Google Cloud", "DigitalOcean", "GitHub", "Sentry", "New Relic", "Cloudflare", "Docker"
         ]
       },
       "crm": {
         "title": "Customer Relationship Management",
-        "subtitle": "We have great experience integrating CRM systems into various business sectors: Products, Services and Manufacturing.",
+        "subtitle": "High-performance ecosystem integration for Products, Services and Manufacturing sectors.",
         "priceFrom": 4980,
         "currency": "EUR",
+        "packages": [
+          {
+            "name": "Core CRM",
+            "price": 4980,
+            "currency": "EUR",
+            "duration": "4 weeks",
+            "description": "Essential CRM integration for small to mid-sized teams focusing on lead management and sales workflows.",
+            "features": [
+              "Contact & lead management",
+              "Sales pipeline automation",
+              "Email integration",
+              "Basic reporting dashboard",
+              "Team training included"
+            ]
+          },
+          {
+            "name": "Enterprise CRM",
+            "price": 9800,
+            "currency": "EUR",
+            "duration": "10 weeks",
+            "description": "Full-scale operational intelligence with advanced automation, custom modules, and deep analytics.",
+            "features": [
+              "Multi-department synchronization",
+              "Advanced workflow automation",
+              "Custom module development",
+              "Real-time analytics engine",
+              "API & ERP integration",
+              "Perpetual maintenance"
+            ]
+          }
+        ],
         "features": [
           "Contact and customer management – stores client profiles, history, contacts",
           "Lead tracking – monitor new contacts, qualify them and convert into customers",
@@ -337,31 +413,30 @@ const data = {
           {
             "step": "01",
             "title": "Discovery",
-            "description": "Business model analysis and workflow mapping"
+            "duration": "1 Cycle",
+            "description": "Deep dive into your business model and complete workflow mapping for optimal logic flow."
           },
           {
             "step": "02",
-            "title": "CRM Architecture Planning",
-            "description": "Technical CRM configuration specification and coordination with management"
+            "title": "Architecture",
+            "duration": "2 Cycles",
+            "description": "Developing complex technical specifications and coordinating with management for seamless transition."
           },
           {
             "step": "03",
-            "title": "CRM System Implementation",
-            "description": "System adaptation to operations and data migration"
+            "title": "Implementation",
+            "duration": "4 Cycles",
+            "description": "System adaptation to operations and complete data migration with zero downtime."
           },
           {
             "step": "04",
-            "title": "Testing",
-            "description": "Sales cycle verification and refinement"
-          },
-          {
-            "step": "05",
-            "title": "Team Training",
-            "description": "Managers and staff trained to work with the system"
+            "title": "Testing & Launch",
+            "duration": "1 Cycle",
+            "description": "Rigorous verification of the sales cycle and team training for immediate operational impact."
           }
         ],
         "technologies": [
-          "CodeIgniter", "Laravel", "Java", "JavaScript", "HTML", "PHP", "CSS", "AI Tools"
+          "Salesforce", "HubSpot", "Bitrix24", "Pipedrive", "Laravel", "PostgreSQL", "React", "Node.js"
         ]
       }
     },
