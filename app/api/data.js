@@ -35,7 +35,12 @@ const data = {
       "instagram": true,
       "pinterest": true,
       "googleBusiness": true
-    }
+    },
+    "techStack": [
+      "WordPress", "WooCommerce", "PrestaShop", "OpenCart",
+      "CodeIgniter", "Laravel", "Java", "JavaScript",
+      "HTML", "PHP", "CSS", "AI TOOLS"
+    ]
   },
   "sitemap": [
     { "id": "01", "slug": "home", "label": "Home" },

@@ -61,13 +61,12 @@ const LoadingScreen = () => {
                     </div>
 
                     {/* Main Content */}
-                    <div className="relative z-10 flex flex-col items-center">
-                        {/* Shimmering Logo/Word */}
-                        <div className="mb-12 overflow-hidden h-20 flex items-center justify-center">
+                    <div className="relative z-10 flex flex-col items-center px-6 md:px-0">
+
+                        {/* Mobile Word Carousel */}
+                        <div className="mb-10 overflow-hidden h-10 flex items-center justify-center md:hidden">
                             <motion.div
-                                animate={{
-                                    y: [0, -80, -160, -240],
-                                }}
+                                animate={{ y: [0, -40, -80, -120] }}
                                 transition={{
                                     duration: 6,
                                     times: [0, 0.3, 0.6, 0.9],
@@ -77,18 +76,71 @@ const LoadingScreen = () => {
                                 className="flex flex-col items-center"
                             >
                                 {words.map((word, i) => (
-                                    <h2 key={i} className="text-4xl md:text-6xl font-bold tracking-tighter text-white h-20 flex items-center">
+                                    <h2 key={i} className="text-2xl font-bold tracking-tighter text-white h-10 flex items-center">
                                         {word}
                                     </h2>
                                 ))}
                             </motion.div>
                         </div>
 
-                        {/* Progress Container */}
-                        <div className="w-64 md:w-96 relative">
+                        {/* Desktop Word Carousel */}
+                        <div className="mb-12 overflow-hidden h-20 items-center justify-center hidden md:flex">
+                            <motion.div
+                                animate={{ y: [0, -80, -160, -240] }}
+                                transition={{
+                                    duration: 6,
+                                    times: [0, 0.3, 0.6, 0.9],
+                                    ease: "easeInOut",
+                                    repeat: 0
+                                }}
+                                className="flex flex-col items-center"
+                            >
+                                {words.map((word, i) => (
+                                    <h2 key={i} className="text-6xl font-bold tracking-tighter text-white h-20 flex items-center">
+                                        {word}
+                                    </h2>
+                                ))}
+                            </motion.div>
+                        </div>
+
+                        {/* Mobile Progress Section */}
+                        <div className="w-full max-w-[260px] md:hidden">
+                            {/* Progress Bar Track */}
+                            <div className="h-[2px] w-full bg-white/10 overflow-hidden relative">
+                                <motion.div
+                                    className="absolute top-0 left-0 h-full bg-accent"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${progress}%` }}
+                                    transition={{ duration: 0.1 }}
+                                />
+                                <motion.div
+                                    className="absolute top-0 h-full w-16 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                                    animate={{ left: ["-20%", "120%"] }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                />
+                            </div>
+
+                            {/* Counter + Status below bar */}
+                            <div className="mt-4 flex items-center justify-between">
+                                <span className="text-[10px] font-mono tracking-[0.15em] text-white/20 uppercase">
+                                    Sparcley v1.0.4
+                                </span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-lg font-black text-white/10 italic select-none">
+                                        {Math.floor(counter)}
+                                    </span>
+                                    <span className="text-[8px] font-mono text-accent uppercase tracking-wider">
+                                        %
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Desktop Progress Section */}
+                        <div className="w-96 relative hidden md:block">
                             {/* Number Counter */}
                             <div className="absolute -top-10 right-0 flex items-baseline">
-                                <span className="text-6xl md:text-8xl font-black text-white/5 italic select-none">
+                                <span className="text-8xl font-black text-white/5 italic select-none">
                                     {Math.floor(counter)}
                                 </span>
                                 <span className="text-xs font-mono text-accent ml-2 uppercase tracking-widest">
@@ -98,44 +150,29 @@ const LoadingScreen = () => {
 
                             {/* Progress Bar Track */}
                             <div className="h-[2px] w-full bg-white/10 rounded-full overflow-hidden relative">
-                                {/* Animated Progress Fill */}
                                 <motion.div
                                     className="absolute top-0 left-0 h-full bg-accent"
                                     initial={{ width: 0 }}
                                     animate={{ width: `${progress}%` }}
                                     transition={{ duration: 0.1 }}
                                 />
-
-                                {/* Moving Glow */}
                                 <motion.div
                                     className="absolute top-0 h-full w-20 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-                                    animate={{
-                                        left: ["-20%", "120%"]
-                                    }}
-                                    transition={{
-                                        duration: 1.5,
-                                        repeat: Infinity,
-                                        ease: "linear"
-                                    }}
+                                    animate={{ left: ["-20%", "120%"] }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                                 />
                             </div>
 
                             {/* Status Text */}
                             <div className="mt-4 flex justify-between items-center text-[10px] font-mono tracking-[0.2em] text-muted uppercase">
                                 <span>Sparcley System v1.0.4</span>
-                                <motion.span
-                                    animate={{ opacity: [1, 0.3, 1] }}
-                                    transition={{ duration: 0.8, repeat: Infinity }}
-                                >
-                                    Loading Assets...
-                                </motion.span>
                             </div>
                         </div>
                     </div>
 
                     {/* Geometric Accents */}
-                    <div className="absolute bottom-10 left-10 w-32 h-32 border-l border-b border-white/5 pointer-events-none" />
-                    <div className="absolute top-10 right-10 w-32 h-32 border-r border-t border-white/5 pointer-events-none" />
+                    <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 w-16 h-16 md:w-32 md:h-32 border-l border-b border-white/5 pointer-events-none" />
+                    <div className="absolute top-6 right-6 md:top-10 md:right-10 w-16 h-16 md:w-32 md:h-32 border-r border-t border-white/5 pointer-events-none" />
 
                     {/* Bottom Scanning Line */}
                     <motion.div

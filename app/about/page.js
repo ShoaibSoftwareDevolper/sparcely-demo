@@ -1,114 +1,446 @@
-// import React from 'react';
-// import data from '@/app/api/data.js';
-// import FadeIn from '../components/ui/FadeIn';
+"use client";
+import React, { useEffect, useRef, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 
-// const AboutPage = () => {
-//     const about = data.pages.about;
+/* ═══════════════════════════════════════════════
+   CANVAS: Software Creation Visualization
+   Draws an animated dependency graph / neural net
+   representing the process of building software.
+═══════════════════════════════════════════════ */
 
-//     return (
-//         <div className="pt-32 min-h-screen bg-background text-foreground">
-//             {/* Hero Section - MASSIVE SCALE */}
-//             <section className="section-padding flex flex-col items-center text-center relative overflow-hidden">
-//                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-accent/5 blur-[150px] rounded-full pointer-events-none" />
-//                 <FadeIn direction="up">
-//                     <div className="max-w-7xl relative">
-//                         <span className="text-accent text-[10px] font-bold uppercase tracking-[1em] mb-16 block italic underline decoration-accent/30 underline-offset-20">Genesis / Digital Frontier</span>
-//                         <h1 className="text-7xl md:text-[15vw] font-black uppercase tracking-tighter leading-[0.8] mb-12">
-//                             {about.heading.split(' ').slice(0, 1)} <br />
-//                             <span className="text-stroke tracking-normal">{about.heading.split(' ').slice(1).join(' ')}</span>
-//                         </h1>
-//                         <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-accent/5 blur-[120px] rounded-full pointer-events-none" />
-//                     </div>
-//                 </FadeIn>
-//             </section>
+const LAYERS = [
+    { label: 'DISCOVERY', nodes: 2, color: 'rgba(231,116,21,0.9)' },
+    { label: 'ARCHITECTURE', nodes: 4, color: 'rgba(231,116,21,0.7)' },
+    { label: 'DEVELOPMENT', nodes: 6, color: 'rgba(231,116,21,0.5)' },
+    { label: 'TESTING', nodes: 4, color: 'rgba(231,116,21,0.7)' },
+    { label: 'DEPLOYMENT', nodes: 2, color: 'rgba(231,116,21,0.9)' },
+];
 
-//             {/* Content Section - RHYTHMIC SPLIT */}
-//             <section className="section-padding grid grid-cols-1 lg:grid-cols-2 gap-48 items-center overflow-hidden">
-//                 <FadeIn direction="left">
-//                     <div className="relative aspect-square group shadow-3xl">
-//                         <div className="absolute -inset-10 bg-accent/5 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-//                         <div className="absolute inset-0 bg-secondary overflow-hidden rounded-[80px] border border-white/5 group-hover:border-accent/30 transition-all duration-1000">
-//                             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-1000 scale-[1.05] group-hover:scale-100"></div>
-//                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-//                         </div>
-//                     </div>
-//                 </FadeIn>
-//                 <div className="flex flex-col justify-center relative">
-//                      <div className="absolute -top-32 -left-32 text-[20vw] font-black text-white/2 select-none pointer-events-none italic uppercase leading-none">Values</div>
-//                     <FadeIn direction="right">
-//                         <span className="text-accent text-[10px] font-bold uppercase tracking-[0.8em] mb-12 block italic">Strategic Ethos</span>
-//                         <h2 className="text-5xl md:text-8xl font-black uppercase mb-16 tracking-tighter leading-[0.85] italic">
-//                             {about.subheading}
-//                         </h2>
-//                     </FadeIn>
-//                     <FadeIn direction="right" delay={0.1}>
-//                         <p className="text-3xl text-muted/60 leading-tight mb-20 font-medium italic border-l-2 border-accent pl-12">
-//                             {about.description}
-//                         </p>
-//                     </FadeIn>
-//                     <FadeIn direction="right" delay={0.2}>
-//                         <div className="p-16 bg-white/2 backdrop-blur-3xl border border-white/10 rounded-[48px] relative overflow-hidden group/quote">
-//                            <div className="absolute top-0 left-0 w-1 h-0 bg-accent group-hover/quote:h-full transition-all duration-1000" />
-//                             <p className="text-2xl italic font-medium leading-relaxed text-white/80">
-//                                 "{about.philosophy}"
-//                             </p>
-//                         </div>
-//                     </FadeIn>
-//                 </div>
-//             </section>
+function buildGraph(W, H) {
+    const layers = [];
+    const padX = W * 0.08;
+    const usableW = W - padX * 2;
+    const usableH = H - 80;
+    const startY = 50;
 
-//             {/* Why Choose Us - LIQUID GRID */}
-//             <section className="section-padding bg-secondary/30 relative border-y border-white/5 overflow-hidden">
-//                 <div className="absolute top-0 right-1/4 w-[60vw] h-full bg-accent/2 blur-[250px] pointer-events-none rounded-full" />
-//                 <FadeIn direction="up">
-//                     <div className="max-w-4xl mb-40">
-//                         <span className="text-accent text-[10px] font-bold uppercase tracking-[1em] mb-8 block italic">Engine of Success</span>
-//                         <h2 className="text-7xl md:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter">
-//                             High <span className="text-stroke tracking-normal">Outcome</span> <br /> Structures.
-//                         </h2>
-//                     </div>
-//                 </FadeIn>
+    LAYERS.forEach((layer, li) => {
+        const x = padX + (li / (LAYERS.length - 1)) * usableW;
+        const nodes = [];
+        for (let ni = 0; ni < layer.nodes; ni++) {
+            const yFrac = layer.nodes === 1 ? 0.5 : ni / (layer.nodes - 1);
+            const y = startY + yFrac * usableH;
+            nodes.push({ x, y, r: 5, phase: Math.random() * Math.PI * 2, speed: 0.8 + Math.random() * 0.6, li, ni });
+        }
+        layers.push({ ...layer, x, nodes });
+    });
 
-//                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 border border-white/5 rounded-[40px] overflow-hidden">
-//                     {about.whyChooseUs.map((value, index) => (
-//                         <FadeIn key={index} direction="up" delay={index * 0.1}>
-//                             <div className="bg-background/40 backdrop-blur-3xl p-20 flex flex-col gap-16 group hover:bg-black transition-all duration-700 min-h-[450px] relative overflow-hidden">
-//                                 <span className="text-9xl font-black text-white/1 group-hover:text-accent/5 absolute -right-4 -bottom-4 transition-colors duration-1000 italic leading-none">{index + 1}</span>
-//                                 <div className="p-8 w-fit bg-accent/10 border border-accent/20 rounded-2xl group-hover:bg-accent group-hover:text-white transition-all duration-700">
-//                                     <span className="text-xl font-black italic">!</span>
-//                                 </div>
-//                                 <p className="text-3xl font-bold uppercase leading-tight tracking-tighter text-white/90 group-hover:text-accent transition-colors duration-500 italic relative z-10">{value}</p>
-//                             </div>
-//                         </FadeIn>
-//                     ))}
-//                 </div>
-//             </section>
+    // Build edges: connect each node to all nodes in next layer
+    const edges = [];
+    for (let li = 0; li < layers.length - 1; li++) {
+        for (const src of layers[li].nodes) {
+            for (const dst of layers[li + 1].nodes) {
+                edges.push({ src, dst, phase: Math.random() * Math.PI * 2, speed: 0.5 + Math.random() });
+            }
+        }
+    }
+    return { layers, edges };
+}
 
-//             {/* Benefits - ULTRA IMPACT SCALE */}
-//             <section className="section-padding overflow-hidden">
-//                 <div className="flex flex-col gap-48">
-//                     {about.benefits.map((benefit, index) => (
-//                         <FadeIn key={index} direction="up" delay={index * 0.1}>
-//                             <div className="flex flex-col md:flex-row items-end gap-16 group cursor-default">
-//                                 <span className="text-accent text-[10px] font-bold uppercase tracking-[1em] mb-10 transition-all group-hover:tracking-[2em] group-hover:text-white duration-1000 whitespace-nowrap">0{index + 1} / Performance</span>
-//                                 <h3 className="text-7xl md:text-[14vw] font-black uppercase leading-[0.75] tracking-tighter group-hover:text-stroke transition-all duration-1000 flex-1">{benefit}</h3>
-//                             </div>
-//                             <div className="w-full h-px bg-white/5 mt-16 group-hover:bg-accent transition-colors duration-1000" />
-//                         </FadeIn>
-//                     ))}
-//                 </div>
-//             </section>
-//         </div>
-//     );
-// };
+function drawSoftwareViz(ctx, graph, t, W, H) {
+    ctx.clearRect(0, 0, W, H);
 
-// export default AboutPage;
-const AboutPage = () => {
+    const { layers, edges } = graph;
+
+    // ── Edges ──
+    for (const edge of edges) {
+        const { src, dst, phase, speed } = edge;
+        const progress = (Math.sin(t * speed * 0.001 + phase) + 1) / 2;
+
+        // Static edge line
+        ctx.beginPath();
+        ctx.moveTo(src.x, src.y);
+        // Bezier with midpoint ctrl
+        const cx1 = src.x + (dst.x - src.x) * 0.4;
+        const cy1 = src.y;
+        const cx2 = src.x + (dst.x - src.x) * 0.6;
+        const cy2 = dst.y;
+        ctx.bezierCurveTo(cx1, cy1, cx2, cy2, dst.x, dst.y);
+        ctx.strokeStyle = 'rgba(231,116,21,0.07)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        // Animated pulse packet along the edge
+        const px = bezierPoint(src.x, cx1, cx2, dst.x, progress);
+        const py = bezierPoint(src.y, cy1, cy2, dst.y, progress);
+        const packetGlow = ctx.createRadialGradient(px, py, 0, px, py, 8);
+        packetGlow.addColorStop(0, 'rgba(231,116,21,0.8)');
+        packetGlow.addColorStop(1, 'rgba(231,116,21,0)');
+        ctx.beginPath();
+        ctx.arc(px, py, 8, 0, Math.PI * 2);
+        ctx.fillStyle = packetGlow;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#e77415';
+        ctx.fill();
+    }
+
+    // ── Nodes ──
+    for (const layer of layers) {
+        for (const node of layer.nodes) {
+            const pulse = 0.6 + 0.4 * Math.sin(t * node.speed * 0.001 + node.phase);
+            const r = node.r * (0.9 + 0.3 * pulse);
+
+            // Outer glow
+            const glow = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, r * 4);
+            glow.addColorStop(0, `rgba(231,116,21,${0.3 * pulse})`);
+            glow.addColorStop(1, 'rgba(231,116,21,0)');
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, r * 4, 0, Math.PI * 2);
+            ctx.fillStyle = glow;
+            ctx.fill();
+
+            // Ring
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, r * 1.8, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(231,116,21,${0.3 * pulse})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Core
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+            ctx.fillStyle = '#e77415';
+            ctx.fill();
+        }
+    }
+
+    // ── Layer Labels ──
+    ctx.save();
+    for (const layer of layers) {
+        const topY = layer.nodes.reduce((m, n) => Math.min(m, n.y), Infinity);
+        ctx.fillStyle = 'rgba(231,116,21,0.5)';
+        ctx.font = '600 9px monospace';
+        ctx.letterSpacing = '0.4em';
+        ctx.textAlign = 'center';
+        ctx.fillText(layer.label, layer.x, topY - 20);
+    }
+    ctx.restore();
+}
+
+function bezierPoint(p0, p1, p2, p3, t) {
+    const mt = 1 - t;
+    return mt * mt * mt * p0 + 3 * mt * mt * t * p1 + 3 * mt * t * t * p2 + t * t * t * p3;
+}
+
+const SoftwareViz = () => {
+    const canvasRef = useRef(null);
+    const rafRef = useRef(null);
+    const graphRef = useRef(null);
+
+    const animate = useCallback((t) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        if (!graphRef.current) {
+            graphRef.current = buildGraph(canvas.width, canvas.height);
+        }
+        const ctx = canvas.getContext('2d');
+        drawSoftwareViz(ctx, graphRef.current, t, canvas.width, canvas.height);
+        rafRef.current = requestAnimationFrame(animate);
+    }, []);
+
+    useEffect(() => {
+        rafRef.current = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(rafRef.current);
+    }, [animate]);
+
     return (
-        <div>
-            <h1>About Page</h1>
+        <div className="relative w-full h-full">
+            <div className="absolute inset-0 bg-accent/5 blur-[80px] scale-75" />
+            <canvas
+                ref={canvasRef}
+                width={680}
+                height={400}
+                className="relative z-10 w-full h-full"
+            />
         </div>
     );
+};
+
+/* ═══════════════════════════════════════════════
+   ABOUT HERO
+═══════════════════════════════════════════════ */
+const AboutHeroNew = ({ heading, subheading }) => {
+    return (
+        <section className="relative pt-[350px] pb-20 overflow-hidden bg-[#0b0b0b]">
+            {/* Grid */}
+            <div className="absolute inset-0 z-10 pointer-events-none opacity-[0.03]"
+                style={{ backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`, backgroundSize: '40px 40px' }}
+            />
+
+            {/* Ghost BG */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 overflow-hidden">
+                <motion.h2
+                    initial={{ opacity: 0 }} animate={{ opacity: 0.025 }}
+                    transition={{ duration: 2 }}
+                    className="text-[30vw] font-black uppercase tracking-tighter leading-none text-white select-none whitespace-nowrap"
+                >
+                    ABOUT
+                </motion.h2>
+            </div>
+
+            <div className="site-padding relative z-20">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 items-end">
+                    {/* LEFT */}
+                    <div className="lg:col-span-7 flex flex-col">
+                        <div className="flex items-center gap-4 mb-10">
+                            <motion.span initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
+                                className="text-accent font-mono text-[10px] tracking-[0.4em] uppercase">// ABOUT_SPARCLEY</motion.span>
+                            <div className="h-px w-20 bg-white/10" />
+                            <motion.span initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}
+                                className="text-white/30 font-mono text-[10px] tracking-[0.4em] uppercase">EST. 2009</motion.span>
+                        </div>
+
+                        <div className="overflow-hidden mb-4">
+                            <motion.h1 initial={{ y: "100%" }} animate={{ y: 0 }} transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
+                                className="text-7xl md:text-[9vw] font-black uppercase tracking-[-0.04em] leading-[0.9] text-white">
+                                We Build <br />
+                                <span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.25)', color: 'transparent' }}>Digital</span>
+                            </motion.h1>
+                        </div>
+                        <div className="overflow-hidden mb-14">
+                            <motion.h1 initial={{ y: "100%" }} animate={{ y: 0 }} transition={{ duration: 0.9, delay: 0.12, ease: [0.76, 0, 0.24, 1] }}
+                                className="text-7xl md:text-[9vw] font-black uppercase tracking-[-0.04em] leading-[0.9] text-accent">
+                                Excellence.
+                            </motion.h1>
+                        </div>
+
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+                            className="flex flex-col md:flex-row items-start md:items-center gap-10">
+                            <p className="text-xl text-white/40 max-w-sm font-medium leading-relaxed">{subheading}. Driven by precision and a relentless pursuit of quality.</p>
+                            <Link href="/contact" className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] border border-white/20 text-white/60 hover:border-accent hover:text-accent transition-all duration-300 px-8 py-4 group">
+                                Work With Us <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                            </Link>
+                        </motion.div>
+                    </div>
+
+                    {/* RIGHT: Metadata */}
+                    <div className="lg:col-span-5 hidden lg:flex flex-col items-end justify-end gap-10 pb-2">
+                        <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }} className="flex flex-col gap-8 items-end">
+                            {[['15+', 'Years Active'], ['200+', 'Projects Shipped'], ['2', 'Global Studios'],].map(([val, label]) => (
+                                <div key={label} className="flex flex-col items-end">
+                                    <span className="text-5xl font-black text-accent leading-none">{val}</span>
+                                    <span className="text-[9px] font-mono text-white/20 uppercase tracking-[0.4em] mt-1">{label}</span>
+                                </div>
+                            ))}
+                        </motion.div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom line */}
+            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            {/* Corner HUD */}
+            <div className="absolute top-0 left-0 w-12 h-12 border-t border-l border-white/5 z-20 hidden lg:block" />
+            <div className="absolute top-0 right-0 w-12 h-12 border-t border-r border-white/5 z-20 hidden lg:block" />
+            {/* Side metadata */}
+            <div className="absolute right-[5%] top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-12 z-30 items-center">
+                <span className="vertical-text text-[9px] font-mono uppercase tracking-[0.5em] text-white/20">London Based Agency</span>
+                <div className="w-px h-24 bg-white/10" />
+            </div>
+        </section>
+    );
+};
+
+/* ═══════════════════════════════════════════════
+   PROCESS VISUALIZATION SECTION
+═══════════════════════════════════════════════ */
+const ProcessSection = ({ whyChooseUs }) => {
+    return (
+        <section className="site-padding py-40 bg-background border-t border-white/5 relative overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none opacity-[0.02]"
+                style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }}
+            />
+            <div className="max-w-[1600px] mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+
+                    {/* Left: Viz */}
+                    <div className="lg:col-span-7">
+                        <div className="flex items-center gap-4 mb-4">
+                            <span className="text-accent font-mono text-[10px] tracking-[0.4em] uppercase">// BUILD_PROCESS</span>
+                            <div className="h-px flex-1 bg-white/5" />
+                        </div>
+
+                        <h2 className="text-5xl md:text-[4vw] font-black uppercase tracking-[-0.04em] leading-[0.9] text-white mb-16">
+                            How We <br /><span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.25)', color: 'transparent' }}>Create.</span>
+                        </h2>
+                        <div className='h-5'></div>
+                        {/* Canvas Visualization */}
+                        <div className="border border-white/5 bg-white/[0.01] p-4 relative overflow-hidden" style={{ height: 380 }}>
+                            <div className="absolute top-3 left-4 flex items-center gap-3 z-10">
+                                <div className="flex gap-1.5">
+                                    {[1, 2, 3].map(i => <div key={i} className="w-2 h-2 bg-accent/60" />)}
+                                </div>
+                                <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/20">SPARCLEY_ENGINE_V2.0 // LIVE</span>
+                            </div>
+                            <div className="w-full h-full pt-8">
+                                <SoftwareViz />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right: Strengths */}
+                    <div className="lg:col-span-5 space-y-0">
+                        <span className="text-accent font-mono text-[10px] tracking-[0.4em] uppercase block mb-10">// CORE_STRENGTHS</span>
+                        {whyChooseUs.map((item, idx) => (
+                            <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, x: 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.08, duration: 0.6 }}
+                                className="group flex items-start gap-8 py-8 border-b border-white/5 hover:border-accent/20 transition-colors"
+                            >
+                                <span className="text-[10px] font-mono text-white/20 mt-1 w-8 flex-shrink-0">0{idx + 1}</span>
+                                <p className="text-lg font-bold text-white/60 group-hover:text-white uppercase tracking-tight leading-tight transition-colors">{item}</p>
+                                <ArrowUpRight className="w-4 h-4 text-white/10 group-hover:text-accent ml-auto mt-1 flex-shrink-0 transition-colors" />
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+/* ═══════════════════════════════════════════════
+   IDENTITY SECTION
+═══════════════════════════════════════════════ */
+const IdentitySection = ({ description, philosophy, benefits }) => {
+    return (
+        <section className="site-padding py-40 bg-background border-t border-white/5">
+            <div className="max-w-[1600px] mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
+                    {/* Left label */}
+                    <div className="lg:col-span-4 border-r border-white/5 pr-16 flex flex-col justify-between">
+                        <div>
+                            <span className="text-accent font-mono text-[10px] tracking-[0.4em] uppercase block mb-12">// OUR_IDENTITY</span>
+                            <h2 className="text-5xl md:text-6xl font-black uppercase tracking-[-0.04em] leading-[0.9] text-white">
+                                Who <br />We <br />
+                                <span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.25)', color: 'transparent' }}>Are.</span>
+                            </h2>
+                        </div>
+                        <div className="mt-20 hidden lg:block">
+                            <div className="w-16 h-px bg-accent mb-4" />
+                            <span className="text-[9px] font-mono text-white/20 uppercase tracking-[0.4em]">SPARCLEY STUDIO // LONDON</span>
+                        </div>
+                    </div>
+
+                    {/* Right content */}
+                    <div className="lg:col-span-8 pl-0 lg:pl-20 pt-16 lg:pt-0 space-y-20">
+                        <p className="text-2xl md:text-4xl font-medium text-white leading-[1.2]">{description}</p>
+
+                        <div className="border-l border-accent/30 pl-10">
+                            <p className="text-xl text-white/40 italic font-light leading-relaxed">&ldquo;{philosophy}&rdquo;</p>
+                            <div className="flex items-center gap-4 mt-6">
+                                <div className="w-8 h-px bg-white/10" />
+                                <span className="text-[10px] font-mono uppercase tracking-widest text-white/20">Design Philosophy</span>
+                            </div>
+                        </div>
+
+                        {/* Benefits */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-white/5">
+                            {benefits.map((b, i) => (
+                                <div key={i} className="p-10 border-r border-b border-white/5 last:border-r-0 group hover:bg-white/[0.02] transition-colors">
+                                    <span className="w-2 h-2 bg-accent block mb-6 animate-pulse" />
+                                    <p className="text-2xl font-black uppercase tracking-tight text-white group-hover:text-accent transition-colors">{b}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+/* ═══════════════════════════════════════════════
+   MISSION SECTION (redesigned)
+═══════════════════════════════════════════════ */
+const MissionSectionNew = ({ mission }) => {
+    return (
+        <section className="site-padding py-40 bg-background border-t border-white/5 relative overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/3 blur-[120px] pointer-events-none" />
+            <div className="max-w-[1600px] mx-auto relative z-10">
+                <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-28">
+                    <div>
+                        <span className="text-accent font-mono text-[10px] tracking-[0.4em] uppercase mb-6 block">// CORE_PROTOCOLS</span>
+                        <h2 className="text-6xl md:text-[7vw] font-black uppercase tracking-[-0.04em] leading-[0.9] text-white">
+                            Mission <br /><span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.25)', color: 'transparent' }}>&amp; Vision.</span>
+                        </h2>
+                    </div>
+                    <span className="text-[9px] font-mono text-white/20 uppercase tracking-[0.4em]">SPARCLEY_ENGINE_V1.0</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-t border-white/5">
+                    {mission.map((point, idx) => (
+                        <motion.div
+                            key={idx}
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="group border-r border-b border-white/5 p-14 relative overflow-hidden hover:bg-white/[0.02] transition-colors"
+                        >
+                            {/* Hover accent line */}
+                            <div className="absolute bottom-0 left-0 w-full h-1 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left" />
+
+                            <div className="flex justify-between items-start mb-10">
+                                <span className="text-[60px] font-black leading-none text-white/5 group-hover:text-accent/20 transition-colors font-mono">0{idx + 1}</span>
+                                <span className="text-[8px] font-mono text-white/20 uppercase tracking-widest border border-white/5 px-3 py-1">ACTIVE_PROTOCOL</span>
+                            </div>
+                            <p className="text-2xl md:text-3xl font-bold text-white leading-tight uppercase tracking-tight group-hover:translate-x-2 transition-transform duration-500">{point}</p>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+/* ═══════════════════════════════════════════════
+   ASSEMBLED ABOUT PAGE
+═══════════════════════════════════════════════ */
+import data from '@/app/api/data.js';
+
+const AboutPage = () => {
+    const aboutData = data.pages.about;
+    const companyData = data.company;
+
+    return (
+        <div className="flex flex-col bg-background">
+            <div className="h-15 md:h-20" />
+            <AboutHeroNew heading={aboutData.heading} subheading={aboutData.subheading} />
+
+            <div className="h-24 md:h-40" />
+
+            <ProcessSection whyChooseUs={aboutData.whyChooseUs} />
+
+            <div className="h-24 md:h-40" />
+
+            <IdentitySection description={aboutData.description} philosophy={aboutData.philosophy} benefits={aboutData.benefits} />
+
+            <div className="h-24 md:h-40" />
+
+            <MissionSectionNew mission={companyData.mission} />
+
+            <div className="h-32 md:h-40" />
+        </div>
+    );
+
 };
 
 export default AboutPage;

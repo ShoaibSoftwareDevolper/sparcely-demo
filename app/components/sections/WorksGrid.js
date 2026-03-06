@@ -18,7 +18,7 @@ const WorksGrid = ({ projects }) => {
     const featured = projects.slice(0, 4);
 
     return (
-        <section className="section-padding overflow-hidden">
+        <section className="section-padding site-padding overflow-hidden">
             <div className="flex flex-col lg:flex-row justify-between items-end mb-40 gap-16">
                 <FadeIn direction="left">
                     <div className="max-w-4xl">

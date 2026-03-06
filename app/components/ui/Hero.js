@@ -22,7 +22,7 @@ const Hero = () => {
         { type: "image", src: "/assets/Marc-Lauder_banner.webp" },
         { type: "video", src: "/assets/andalusia-dream-banner-compressed.webm" },
         { type: "image", src: "/assets/landing-page-img-compressed.webp" },
-        { type: "image", src: "/assets/workon_landing_compressed.jpg" },
+        { type: "image", src: "/assets/workon_landing_compressed.webp" },
         { type: "image", src: "/assets/toptis_banner.webp" },
     ];
 
@@ -60,7 +60,7 @@ const Hero = () => {
                 </motion.h2>
             </div>
 
-            <div className="w-full px-8 md:px-[10%] relative z-20">
+            <div className="w-full relative z-20 site-padding">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0 items-center">
 
                     {/* LEFT SIDE: Core Messaging */}
@@ -194,24 +194,37 @@ const Hero = () => {
                         </AnimatePresence>
 
                         {/* Architectural Controls Attached to Image */}
-                        <div className="absolute -bottom-10 md:bottom-12 -left-4 md:-left-12 z-30 bg-white p-6 md:p-10 flex flex-col gap-6 shadow-2xl">
-                            <div className="flex gap-4">
-                                <button onClick={prevSlide} className="w-12 h-12 border border-black/10 flex items-center justify-center hover:bg-black hover:text-white transition-all group">
-                                    <span className="text-xl">←</span>
+                        <div className="absolute -bottom-6 md:bottom-8 -left-2 md:-left-16 z-30 backdrop-blur-xl bg-black/40 border border-white/10 p-5 md:p-8 flex flex-col gap-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+                            {/* Decorative Corner Tab */}
+                            <div className="absolute top-0 left-0 w-8 h-px bg-accent/80" />
+                            <div className="absolute top-0 left-0 w-px h-8 bg-accent/80" />
+
+                            <div className="flex gap-3 relative z-10">
+                                <button onClick={prevSlide} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:border-white hover:text-black transition-all duration-300 group relative overflow-hidden">
+                                    <span className="absolute inset-0 bg-white scale-0 group-hover:scale-100 transition-transform duration-300 ease-out rounded-full origin-center" />
+                                    <span className="relative z-10 text-lg font-light group-hover:-translate-x-1 transition-transform duration-300">←</span>
                                 </button>
-                                <button onClick={nextSlide} className="w-12 h-12 border border-black/10 flex items-center justify-center hover:bg-black hover:text-white transition-all group">
-                                    <span className="text-xl">→</span>
+                                <button onClick={nextSlide} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:border-white hover:text-black transition-all duration-300 group relative overflow-hidden">
+                                    <span className="absolute inset-0 bg-white scale-0 group-hover:scale-100 transition-transform duration-300 ease-out rounded-full origin-center" />
+                                    <span className="relative z-10 text-lg font-light group-hover:translate-x-1 transition-transform duration-300">→</span>
                                 </button>
                             </div>
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-mono text-black/30 uppercase tracking-[0.2em] mb-2">PROGRESSION</span>
-                                <div className="w-32 h-[2px] bg-black/5 relative overflow-hidden">
+
+                            <div className="flex flex-col relative z-10">
+                                <div className="flex justify-between items-end mb-3">
+                                    <span className="text-[9px] font-mono text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                                        Sequence
+                                    </span>
+                                    <span className="text-[10px] font-mono text-white/50 tracking-widest">{`0${current + 1} // 0${slides.length}`}</span>
+                                </div>
+                                <div className="w-36 md:w-48 h-[2px] bg-white/10 relative overflow-hidden rounded-full">
                                     <motion.div
                                         key={current}
                                         initial={{ x: "-100%" }}
                                         animate={{ x: "0%" }}
                                         transition={{ duration: 8, ease: "linear" }}
-                                        className="absolute inset-0 bg-accent"
+                                        className="absolute inset-0 bg-accent rounded-full"
                                     />
                                 </div>
                             </div>

@@ -16,7 +16,7 @@ const VideoSection = ({ heading }) => {
                 <div className="absolute top-0 left-3/4 h-full w-px bg-white/5" />
             </div>
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-[5%] z-10">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 site-padding">
                 <FadeIn direction="up">
                     <span className="text-accent text-[10px] font-bold uppercase tracking-[1.5em] mb-16 block italic underline decoration-accent/30 underline-offset-20">Vision / Performance</span>
                     <h2 className="text-7xl md:text-[15vw] font-black uppercase mb-16 max-w-none leading-none tracking-tighter">

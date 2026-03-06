@@ -1,198 +1,135 @@
 "use client"
-import React, { useRef } from 'react';
-import {
-    motion,
-    useMotionTemplate,
-    useScroll,
-    useTransform,
-} from "framer-motion";
-import { ArrowUpRight, MapPin } from "lucide-react";
-import Button from '@/app/components/ui/Button';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import FadeIn from '@/app/components/ui/FadeIn';
+import { FiArrowRight, FiCommand, FiShield, FiZap, FiBox, FiCpu, FiGlobe } from 'react-icons/fi';
+import Link from 'next/link';
 
-const SECTION_HEIGHT = 1500;
-
-const ServicesIntro = ({ projects }) => {
+const ServiceItem = ({ service, index, activeIndex, setActiveIndex }) => {
+    const isActive = activeIndex === index;
+    const icons = [<FiCpu />, <FiGlobe />, <FiBox />];
+    
     return (
-        <div className="bg-[#0b0b0b]">
-            <Hero projects={projects} />
-            {/* The user asked to remove the archive/list part, so we only keep the Hero and Parallax logic */}
-        </div>
-    );
-};
-
-const Hero = ({ projects }) => {
-    return (
-        <div
-            style={{ height: `calc(${SECTION_HEIGHT}px + 100vh)` }}
-            className="relative w-full"
+        <motion.div 
+            onMouseEnter={() => setActiveIndex(index)}
+            className="group relative border-t border-white/5 py-12 md:py-20 transition-all duration-500 cursor-pointer"
         >
-            <CenterImage project={projects[0]} />
-
-            <ParallaxImages projects={projects.slice(1, 5)} />
-
-            <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-b from-[#0b0b0b]/0 to-[#0b0b0b]" />
-        </div>
-    );
-};
-
-const CenterImage = ({ project }) => {
-    const { scrollY } = useScroll();
-
-    const clip1 = useTransform(scrollY, [0, 1500], [25, 0]);
-    const clip2 = useTransform(scrollY, [0, 1500], [75, 100]);
-
-    const clipPath = useMotionTemplate`polygon(${clip1}% ${clip1}%, ${clip2}% ${clip1}%, ${clip2}% ${clip2}%, ${clip1}% ${clip2}%)`;
-
-    const backgroundSize = useTransform(
-        scrollY,
-        [0, SECTION_HEIGHT + 500],
-        ["170%", "100%"]
-    );
-    const opacity = useTransform(
-        scrollY,
-        [SECTION_HEIGHT, SECTION_HEIGHT + 500],
-        [1, 0]
-    );
-
-    return (
-        <motion.div
-            className="sticky top-0 h-screen w-full flex items-center justify-center"
-            style={{
-                clipPath,
-                backgroundSize,
-                opacity,
-                backgroundImage: `url(/assets/Marc-Lauder_banner.webp)`, // Real asset link
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-            }}
-        >
-            {/* Technical HUD Overlay for the center image to keep it "Next-Gen" */}
-            <div className="relative z-10 text-center px-10">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    className="bg-black/40 backdrop-blur-3xl border border-white/10 p-12 max-w-2xl mx-auto group"
-                >
-                    <span className="font-mono text-[10px] text-accent font-bold uppercase tracking-[0.5em] mb-6 block">
-                        [ FEATURED_CASE // 01 ]
+            <div className="flex flex-col md:flex-row md:items-center gap-10 md:gap-20">
+                {/* Visual Locator */}
+                <div className="flex items-center gap-6 md:w-48">
+                    <span className={`font-mono text-xs transition-colors duration-500 ${isActive ? 'text-accent' : 'text-white/10'}`}>
+                        [{service.number}]
                     </span>
-                    <h2 className="text-5xl md:text-8xl font-black uppercase text-white mb-8 tracking-tighter leading-none">
-                        {project?.name || "MARC LAUDER"}
-                    </h2>
-                    <div className="flex items-center justify-center gap-10 mb-10">
-                        <div className="h-px w-10 bg-white/20" />
-                        <span className="font-mono text-[9px] text-white/40 uppercase tracking-widest">{project?.category}</span>
-                        <div className="h-px w-10 bg-white/20" />
+                    <div className={`h-px transition-all duration-700 ${isActive ? 'w-12 bg-accent' : 'w-0 bg-white/10'}`} />
+                </div>
+
+                {/* Content Block */}
+                <div className="flex-1 space-y-4">
+                    <h3 className={`text-4xl md:text-7xl font-black uppercase tracking-tighter transition-all duration-700 ${isActive ? 'text-white' : 'text-white/20'}`}>
+                        {service.title}
+                    </h3>
+                    
+                    <AnimatePresence>
+                        {isActive && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                className="overflow-hidden"
+                            >
+                                <p className="text-white/40 text-sm md:text-base max-w-2xl leading-relaxed py-4">
+                                    {service.description}
+                                </p>
+                                <div className="flex gap-4 pt-4">
+                                    <span className="px-3 py-1 rounded-full border border-white/10 font-mono text-[8px] text-white/40 uppercase tracking-widest">Architectural_Logic</span>
+                                    <span className="px-3 py-1 rounded-full border border-white/10 font-mono text-[8px] text-white/40 uppercase tracking-widest">Module_Sync_V.4</span>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Right Action */}
+                <div className="flex items-center gap-8">
+                     <div className={`text-4xl transition-all duration-700 ${isActive ? 'text-accent scale-110' : 'text-white/5 scale-100'}`}>
+                        {icons[index] || icons[0]}
                     </div>
-                    <Button href={project?.url} external variant="outline" icon={<ArrowUpRight size={16} />}>
-                        EXPLORE CASE
-                    </Button>
-                </motion.div>
+                    <Link 
+                        href={`/services/${service.slug}`}
+                        className={`w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-500 ${isActive ? 'border-accent bg-accent text-black rotate-0' : 'border-white/10 text-white/20 -rotate-45'}`}
+                    >
+                        <FiArrowRight size={24} />
+                    </Link>
+                </div>
             </div>
 
-            {/* HUD Elements */}
-            <div className="absolute top-10 left-[10%] font-mono text-[9px] text-white/20 uppercase tracking-[0.4em]">
-                PROCES_STREAM // INITIATED
-            </div>
-            <div className="absolute bottom-10 right-[10%] font-mono text-[9px] text-white/20 uppercase tracking-[0.4em]">
-                COORD // 51.5074° N, 0.1278° W
-            </div>
+            {/* Liquid Background Glow */}
+            <div className={`absolute inset-0 -z-10 bg-gradient-to-r from-accent/[0.03] to-transparent opacity-0 transition-opacity duration-700 ${isActive ? 'opacity-100' : ''}`} />
         </motion.div>
     );
-};
+}
 
-const ParallaxImages = ({ projects }) => {
-    // Mapping the reference code's layout to our project data
-    const assets = [
-        "/assets/andalusia-dream-banner-compressed.webm",
-        "/assets/landing-page-img-compressed.webp",
-        "/assets/workon_landing_compressed.jpg",
-        "/assets/toptis_banner.webp"
-    ];
+const ServicesIntro = ({ data }) => {
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    if (!data) return null;
 
     return (
-        <div className="mx-auto max-w-7xl px-8 pt-[200px] grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-40">
-            <ParallaxImg
-                project={projects[0]}
-                src={assets[0]}
-                alt={projects[0]?.name}
-                start={-200}
-                end={200}
-                className="w-full md:w-10/12"
-                isVideo
-            />
-            <ParallaxImg
-                project={projects[1]}
-                src={assets[1]}
-                alt={projects[1]?.name}
-                start={200}
-                end={-250}
-                className="w-full md:w-11/12 md:mt-40"
-            />
-            <ParallaxImg
-                project={projects[2]}
-                src={assets[2]}
-                alt={projects[2]?.name}
-                start={-200}
-                end={200}
-                className="w-full md:w-9/12 ml-auto"
-            />
-            <ParallaxImg
-                project={projects[3]}
-                src={assets[3]}
-                alt={projects[3]?.name}
-                start={0}
-                end={-500}
-                className="w-full md:w-10/12 md:-mt-20"
-            />
-        </div>
-    );
-};
+        <section className="relative pt-32 pb-60 overflow-hidden">
+            {/* High-End Background detail */}
+            <div className="absolute inset-0 pointer-events-none opacity-20">
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(var(--accent-rgb),0.05),transparent_70%)]" />
+            </div>
 
-const ParallaxImg = ({ className, alt, src, start, end, project, isVideo }) => {
-    const ref = useRef(null);
-
-    const { scrollYProgress } = useScroll({
-        target: ref,
-        offset: [`${start}px end`, `end ${end * -1}px`],
-    });
-
-    const opacity = useTransform(scrollYProgress, [0.75, 1], [1, 0]);
-    const scale = useTransform(scrollYProgress, [0.75, 1], [1, 0.85]);
-
-    const y = useTransform(scrollYProgress, [0, 1], [start, end]);
-    const transform = useMotionTemplate`translateY(${y}px) scale(${scale})`;
-
-    return (
-        <motion.div
-            ref={ref}
-            style={{ transform, opacity }}
-            className={`${className} group cursor-pointer`}
-        >
-            <div className="relative overflow-hidden bg-zinc-900 border border-white/5 transition-all duration-700 group-hover:border-accent/40">
-                {isVideo ? (
-                    <video src={src} autoPlay muted loop className="w-full h-[55vh] object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700" />
-                ) : (
-                    <img src={src} alt={alt} className="w-full h-[55vh] object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700" />
-                )}
-
-                <div className="absolute inset-0 p-10 flex flex-col justify-end bg-gradient-to-t from-black/90 via-black/20 to-transparent">
-                    <span className="font-mono text-[9px] text-accent uppercase tracking-widest mb-4 block font-bold">
-                    // CASE_{project?.category?.toUpperCase().replace(' ', '_')}
-                    </span>
-                    <h3 className="text-4xl font-black uppercase text-white mb-6 group-hover:text-accent transition-colors duration-500 leading-none">
-                        {project?.name}
-                    </h3>
-                    <div className="flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
-                        <div className="h-px w-8 bg-accent" />
-                        <span className="font-mono text-[9px] text-white/40 uppercase">Initiate Protocol</span>
+            <div className="site-padding relative z-10">
+                <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-32">
+                    <div className="max-w-4xl">
+                        <FadeIn direction="up">
+                            <div className="flex items-center gap-4 mb-8">
+                                <div className="w-12 h-px bg-accent" />
+                                <span className="font-mono text-[10px] tracking-[0.4em] text-accent uppercase font-bold">
+                                    // CORE_SOLUTIONS
+                                </span>
+                            </div>
+                            <h2 className="text-6xl md:text-[8vw] font-black uppercase leading-[0.8] tracking-tighter text-white">
+                                SYSTEM <br />
+                                <span className="text-stroke">MAPPING.</span>
+                            </h2>
+                        </FadeIn>
+                    </div>
+                    <div className="pb-4 hidden md:block">
+                        <FadeIn direction="up" delay={0.2}>
+                            <p className="text-white/20 font-mono text-[10px] uppercase tracking-[0.5em] leading-[2]">
+                                Precision Development <br /> Architectural Integrity <br /> Seamless Scaling
+                            </p>
+                        </FadeIn>
                     </div>
                 </div>
 
-                {/* Architectural Border Reveal */}
-                <div className="absolute top-0 left-0 w-0 h-[2px] bg-accent group-hover:w-full transition-all duration-1000" />
+                {/* Interactive Solution List */}
+                <div className="max-w-7xl mx-auto border-b border-white/5">
+                    {data.services.map((service, index) => (
+                        <ServiceItem 
+                            key={service.slug} 
+                            service={service} 
+                            index={index} 
+                            activeIndex={activeIndex}
+                            setActiveIndex={setActiveIndex}
+                        />
+                    ))}
+                </div>
             </div>
-        </motion.div>
+
+            {/* Aesthetic Bottom Meta */}
+            <div className="site-padding mt-20 flex justify-between items-center opacity-10">
+                <span className="font-mono text-[8px] tracking-[1.5em] text-white uppercase">V4.0 // ARCHITECTURE_ACTIVE</span>
+                <div className="flex gap-4">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                    <div className="w-12 h-px bg-white/20 my-auto" />
+                </div>
+            </div>
+        </section>
     );
 };
 

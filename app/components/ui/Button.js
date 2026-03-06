@@ -14,7 +14,7 @@ const Button = ({
     const isLink = !!href;
 
     // Core next-gen styles: Minimal, sharp, and architectural
-    const baseStyles = "relative group inline-flex items-center justify-center font-bold uppercase text-[11px] tracking-[0.2em] transition-all duration-500 overflow-hidden py-5 px-10 border border-white/10";
+    const baseStyles = "relative group inline-flex items-center justify-center font-bold uppercase text-[11px] tracking-[0.2em] transition-all duration-500 overflow-hidden py-6 px-14 border border-white/10";
 
     const variants = {
         primary: "bg-white text-black border-white",
